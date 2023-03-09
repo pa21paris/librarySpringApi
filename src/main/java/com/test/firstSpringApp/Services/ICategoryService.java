@@ -15,8 +15,7 @@ public interface ICategoryService {
     public List<Category> getAllCategories();
     public Category getCategoryById(int id);
     public Category getCategoryByName(String name);
-    public void createNewCategory(Category cat);
-    public void updateCategory(Category cat, int idCat);
-    public void deleteCategory(Category cat);
+    public Category createNewCategory(Category cat);
+    public Category updateCategory(Category cat);
     public void deleteCategoryById(int id);
 }

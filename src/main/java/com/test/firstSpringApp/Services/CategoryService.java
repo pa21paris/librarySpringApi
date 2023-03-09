@@ -7,7 +7,6 @@ package com.test.firstSpringApp.Services;
 import com.test.firstSpringApp.Repositories.CategoryRepository;
 import com.test.firstSpringApp.Entities.Category;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,27 +32,22 @@ public class CategoryService implements ICategoryService{
 
     @Override
     public Category getCategoryByName(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return cr.findByCategoryDescription(name);
     }
 
     @Override
-    public void createNewCategory(Category cat) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public Category createNewCategory(Category cat) {
+        return cr.save(cat);
     }
 
     @Override
-    public void updateCategory(Category cat, int idCat) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public void deleteCategory(Category cat) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public Category updateCategory(Category cat) {
+        return cr.save(cat);
     }
 
     @Override
     public void deleteCategoryById(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        cr.deleteById(id);
     }
         
 }

@@ -9,9 +9,12 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.test.firstSpringApp.Entities.Category;
-import java.util.ArrayList;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -25,17 +28,62 @@ public class CategoryController {
     private CategoryService cs;
     
     @GetMapping("/categories")
-    public List<Category> getAllCategories(@RequestParam Optional<Integer> id){
-        List<Category> res;
-        if(!id.isEmpty()){
-            res=new ArrayList<>();
-            try {
-                res.add(cs.getCategoryById(id.get()));
-            } catch (Exception e) {
-            }
-            
+    public List<Category> getAllCategories(){
+        return cs.getAllCategories();
+    }
+    @GetMapping("/categories/{id}")
+    public Category getCategoryById(@PathVariable int id){
+        Category cat;
+        try {
+            cat=cs.getCategoryById(id);
+        } catch (Exception e) {
+            cat=new Category();
+        }
+        return cat;
+    }
+    
+    @PostMapping("/categories")
+    public Category createCategory(@RequestBody Category newCategory){
+        if(newCategory.getId()!=0){
+            Category cat=new Category();
+            cat.setCategoryDescription("ids generate automatically");
+            return cat;
         }else{
-            res=cs.getAllCategories();
+            try {
+                newCategory.setId(cs.createNewCategory(newCategory).getId());
+            } catch (Exception e) {
+                newCategory.setCategoryDescription("There was an error creating the category");
+            }
+            return newCategory;
+        }
+        
+    }
+    
+    @PutMapping("/categories/{id}")
+    public Category updateCategory(@PathVariable int id, @RequestBody Category cat){
+        if(id<=0){
+            cat.setCategoryDescription("Invalid id");
+        }else if(cat.getId()!=0){
+            cat.setCategoryDescription("You shouldn't send id field on body");
+        }else{
+            cat.setId(id);
+            try {
+                cat=cs.updateCategory(cat);
+            } catch (Exception e) {
+                cat.setCategoryDescription("There was an error updating the category");
+            }
+        }
+        return cat;
+    }
+    
+    @DeleteMapping("/categories/{id}")
+    public String deleteCategory(@PathVariable int id){
+        String res;
+        try {
+            cs.deleteCategoryById(id);
+            res="Deleted category successfully";
+        } catch (Exception e) {
+            res="There was an error deleting the category";
         }
         return res;
     }

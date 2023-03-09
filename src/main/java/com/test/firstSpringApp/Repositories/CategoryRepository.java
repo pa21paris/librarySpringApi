@@ -13,4 +13,6 @@ import org.springframework.stereotype.Repository;
  * @author papar
  */
 @Repository
-public interface CategoryRepository extends CrudRepository<Category, Integer>{}
+public interface CategoryRepository extends CrudRepository<Category, Integer>{
+    Category findByCategoryDescription(String categoryDescription);
+}
