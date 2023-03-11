@@ -4,6 +4,7 @@
  */
 package com.test.firstSpringApp.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,7 +19,7 @@ import java.util.List;
  * @author papar
  */
 @Entity
-@Table(name = "Author")
+@Table(name = "Authors")
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +31,7 @@ public class Author {
     private String lastName;
 
     @OneToMany(mappedBy = "author")
+    @JsonIdentityReference(alwaysAsId = true)
     List<BookAuthor> books;
     
     public int getId() {
@@ -54,6 +56,14 @@ public class Author {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public List<BookAuthor> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<BookAuthor> books) {
+        this.books = books;
     }
     
 }

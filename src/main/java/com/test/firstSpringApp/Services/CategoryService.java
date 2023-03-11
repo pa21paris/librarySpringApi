@@ -31,8 +31,8 @@ public class CategoryService implements ICategoryService{
     }
 
     @Override
-    public Category getCategoryByName(String name) {
-        return cr.findByCategoryDescription(name);
+    public List<Category> getCategoryByKeyWord(String keyword) {
+        return cr.findByCategoryDescriptionLike("%"+keyword+"%");
     }
 
     @Override
@@ -48,6 +48,11 @@ public class CategoryService implements ICategoryService{
     @Override
     public void deleteCategoryById(int id) {
         cr.deleteById(id);
+    }
+
+    @Override
+    public boolean existCategoryById(int id) {
+        return cr.existsById(id);
     }
         
 }

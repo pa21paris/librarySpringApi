@@ -14,8 +14,9 @@ import java.util.List;
 public interface ICategoryService {
     public List<Category> getAllCategories();
     public Category getCategoryById(int id);
-    public Category getCategoryByName(String name);
+    public List<Category> getCategoryByKeyWord(String name);
     public Category createNewCategory(Category cat);
     public Category updateCategory(Category cat);
     public void deleteCategoryById(int id);
+    public boolean existCategoryById(int id);
 }

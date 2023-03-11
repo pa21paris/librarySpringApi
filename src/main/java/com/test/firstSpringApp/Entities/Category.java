@@ -4,12 +4,15 @@
  */
 package com.test.firstSpringApp.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 
 /**
  *
@@ -24,6 +27,10 @@ public class Category {
     private int id;
     @Column(name = "CATEGORY_DESCRIPTION")
     private String categoryDescription;
+    
+    @OneToMany(mappedBy = "category")
+    @JsonIgnore
+    private List<Book> books;
 
     public int getId() {
         return id;
@@ -39,6 +46,14 @@ public class Category {
 
     public void setCategoryDescription(String categoryDescription) {
         this.categoryDescription = categoryDescription;
+    }
+
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
     }
     
 }

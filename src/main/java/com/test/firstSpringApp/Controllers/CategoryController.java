@@ -9,12 +9,15 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.test.firstSpringApp.Entities.Category;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -23,15 +26,27 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author papar
  */
 @RestController
+@RequestMapping("/categories")
 public class CategoryController {
     @Autowired
     private CategoryService cs;
     
-    @GetMapping("/categories")
-    public List<Category> getAllCategories(){
-        return cs.getAllCategories();
+    @GetMapping()
+    public ResponseEntity<List<Category>> getAllCategories(@RequestParam Optional<String> keyword){
+        if(keyword.isEmpty()){
+            try {
+                return ResponseEntity.ok(cs.getAllCategories());
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                return ResponseEntity.badRequest().build();
+            }
+            
+        }else{
+            return ResponseEntity.ok(cs.getCategoryByKeyWord(keyword.get()));
+        }
+        
     }
-    @GetMapping("/categories/{id}")
+    @GetMapping("/{id}")
     public Category getCategoryById(@PathVariable int id){
         Category cat;
         try {
@@ -42,7 +57,7 @@ public class CategoryController {
         return cat;
     }
     
-    @PostMapping("/categories")
+    @PostMapping()
     public Category createCategory(@RequestBody Category newCategory){
         if(newCategory.getId()!=0){
             Category cat=new Category();
@@ -59,7 +74,7 @@ public class CategoryController {
         
     }
     
-    @PutMapping("/categories/{id}")
+    @PutMapping("/{id}")
     public Category updateCategory(@PathVariable int id, @RequestBody Category cat){
         if(id<=0){
             cat.setCategoryDescription("Invalid id");
@@ -76,7 +91,7 @@ public class CategoryController {
         return cat;
     }
     
-    @DeleteMapping("/categories/{id}")
+    @DeleteMapping("/{id}")
     public String deleteCategory(@PathVariable int id){
         String res;
         try {

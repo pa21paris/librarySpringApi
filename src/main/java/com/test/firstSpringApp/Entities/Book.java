@@ -4,11 +4,15 @@
  */
 package com.test.firstSpringApp.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.List;
@@ -25,15 +29,22 @@ public class Book {
     @Column(name = "ID")
     private int id;
     @Column(name = "CATEGORY_ID")
-    private int categoryID;
+    @JsonIgnore
+    private int categoryId;
     @Column(name = "BOOK_TITLE")
     private String bookTitle;
     @Column(name = "PUBLISHER")
     private String publisher;
     
     @OneToMany(mappedBy = "book")
-    List<BookAuthor> authors;
+    @JsonIgnoreProperties("book")
+    private List<BookAuthor> authors;
 
+    @ManyToOne
+    @JoinColumn(name = "CATEGORY_ID", insertable = false, updatable = false)
+    @JsonIgnoreProperties("books")
+    private Category category;
+    
     public int getId() {
         return id;
     }
@@ -42,12 +53,12 @@ public class Book {
         this.id = id;
     }
 
-    public int getCategoryID() {
-        return categoryID;
+    public int getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategoryID(int categoryID) {
-        this.categoryID = categoryID;
+    public void setCategoryId(int categoryID) {
+        this.categoryId = categoryID;
     }
 
     public String getBookTitle() {
@@ -64,6 +75,22 @@ public class Book {
 
     public void setPublisher(String publisher) {
         this.publisher = publisher;
+    }
+
+    public List<BookAuthor> getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(List<BookAuthor> authors) {
+        this.authors = authors;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
     
 }
