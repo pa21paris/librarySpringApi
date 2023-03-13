@@ -28,7 +28,7 @@ public class BookAuthor {
     
     @ManyToOne
     @JoinColumn(name = "ID_BOOK",insertable = false,updatable = false)
-    @JsonIgnoreProperties("authors")
+    @JsonIgnoreProperties({"authors","categoryId","publisher","category"})
     @JsonUnwrapped
     private Book book;
     @ManyToOne

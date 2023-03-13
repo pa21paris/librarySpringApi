@@ -4,7 +4,7 @@
  */
 package com.test.firstSpringApp.Entities;
 
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,7 +31,7 @@ public class Author {
     private String lastName;
 
     @OneToMany(mappedBy = "author")
-    @JsonIdentityReference(alwaysAsId = true)
+    @JsonIgnoreProperties("author")
     List<BookAuthor> books;
     
     public int getId() {
