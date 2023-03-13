@@ -29,7 +29,6 @@ public class Book {
     @Column(name = "ID")
     private int id;
     @Column(name = "CATEGORY_ID")
-    @JsonIgnore
     private int categoryId;
     @Column(name = "BOOK_TITLE")
     private String bookTitle;
@@ -42,7 +41,7 @@ public class Book {
 
     @ManyToOne
     @JoinColumn(name = "CATEGORY_ID", insertable = false, updatable = false)
-    @JsonIgnoreProperties("books")
+    @JsonIgnoreProperties({"books","id"})
     private Category category;
     
     public int getId() {
