@@ -31,12 +31,18 @@ public class BookAuthor {
     @JsonIgnoreProperties("authors")
     @JsonUnwrapped
     private Book book;
-    
     @ManyToOne
     @JoinColumn(name = "ID_AUTHOR",updatable = false,insertable = false)
     @JsonIgnoreProperties("books")
     @JsonUnwrapped
     private Author author;
+    
+    public void setId(int bookId, int authorId){
+        BookAuthorPK baPk=new BookAuthorPK();
+        baPk.setIdAuthor(authorId);
+        baPk.setIdBook(bookId);
+        this.id=baPk;
+    }
     
     public BookAuthorPK getId() {
         return id;
