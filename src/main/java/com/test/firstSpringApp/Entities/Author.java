@@ -12,6 +12,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Null;
 import java.util.List;
 
 /**
@@ -26,12 +30,14 @@ public class Author {
     @Column(name = "ID")
     private int id;
     @Column(name = "FIRST_NAME")
+    @NotBlank(message = "Is required")
     private String firstName;
     @Column(name = "LAST_NAME")
+    @NotBlank(message = "Is required")
     private String lastName;
-
     @OneToMany(mappedBy = "author")
     @JsonIgnoreProperties("author")
+    @Null(message = "There shouldn't be books on body")
     List<BookAuthor> books;
     
     public int getId() {
