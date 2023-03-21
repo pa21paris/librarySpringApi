@@ -5,9 +5,12 @@
 
 package com.test.firstSpringApp.ErrorHandlers;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -32,5 +35,19 @@ public class Verifier {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_PROBLEM_JSON)
                 .body(errorMap);
+    }
+    
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException ex){
+        Set<ConstraintViolation<?>> constraintsViolated=ex.getConstraintViolations();
+        Map<String,String> violationsMap= new HashMap<>();
+        
+        constraintsViolated.forEach((constraintViolated) -> {
+            violationsMap.put(constraintViolated.getPropertyPath().toString().split("\\.",2)[1],
+                    constraintViolated.getMessage());
+        });
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                .body(violationsMap);
     }
 }

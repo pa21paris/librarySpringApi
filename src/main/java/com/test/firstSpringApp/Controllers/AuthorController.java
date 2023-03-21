@@ -8,12 +8,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.test.firstSpringApp.Entities.Author;
 import com.test.firstSpringApp.Services.AuthorService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/authors")
+@Validated
 public class AuthorController {
     
     private AuthorService as;
@@ -111,15 +114,11 @@ public class AuthorController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteAuthor(@PathVariable int id){
-        if(id<=0){
-            return ResponseEntity.badRequest()
-                    .contentType(MediaType.APPLICATION_PROBLEM_JSON)
-                    .body("{\"message\":\"Id should be greater that 0\"}");
-        }else{
+    public ResponseEntity<String> deleteAuthor(
+            @PathVariable @Min(value = 1,message = "Id should be greater that 0") int id
+    ){
             as.deleteAuthor(id);
             return ResponseEntity.noContent().build();
-        }
     }
     
 }
