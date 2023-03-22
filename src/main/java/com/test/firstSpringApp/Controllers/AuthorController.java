@@ -50,7 +50,9 @@ public class AuthorController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Author> getAuthorById(@PathVariable int id){
+    public ResponseEntity<Author> getAuthorById(
+            @PathVariable @Min(value = 1,message = "Id should be greater that 0") int id
+    ){
         Optional<Author> res=as.getAuthorById(id);
         if(res.isEmpty()){
             return ResponseEntity.notFound().build();
@@ -60,12 +62,11 @@ public class AuthorController {
     }
     
     @PostMapping()
-    public ResponseEntity<String> createAuthor(@RequestBody Author a){
-        if(a.getId()!=0 || a.getFirstName()==null || a.getLastName()==null){
+    public ResponseEntity<String> createAuthor(@RequestBody @Valid Author a){
+        if(a.getId()!=0){
             return ResponseEntity.badRequest()
                     .contentType(MediaType.APPLICATION_PROBLEM_JSON)
-                    .body("{\"message\":"
-                            + "\"Request body shouldn't have id and must have first and last name\"}");
+                    .body("{\"message\":\"Request body shouldn't have id\"}");
         }else{
             Optional<Author> res=as.createAuthor(a);
             if(res.isEmpty()){
@@ -89,11 +90,14 @@ public class AuthorController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateAuthor(@PathVariable int id, @Valid @RequestBody Author a){
-        if(id<=0 || a.getId()!=0){
+    public ResponseEntity<String> updateAuthor(
+            @PathVariable @Min(value = 1,message = "Id should be greater that 0") int id,
+            @Valid @RequestBody Author a
+    ){
+        if(a.getId()!=0){
             return ResponseEntity.badRequest()
                     .contentType(MediaType.APPLICATION_PROBLEM_JSON)
-                    .body("{\"message\":\"Id should be greater that 0 and shouldn't be on body\"}");
+                    .body("{\"message\":\"Id shouldn't be on body\"}");
         }else{
             a.setId(id);
             Optional<Author> res=as.updateAuthor(a);

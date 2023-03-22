@@ -7,10 +7,13 @@ package com.test.firstSpringApp.Controllers;
 import com.test.firstSpringApp.Entities.Book;
 import com.test.firstSpringApp.Services.BookService;
 import com.test.firstSpringApp.Services.CategoryService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/books")
+@Validated
 public class BookController {
     
     private CategoryService cs;
@@ -42,7 +46,9 @@ public class BookController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Book> getBookById(@PathVariable int id){
+    public ResponseEntity<Book> getBookById(
+            @PathVariable @Min(value = 1,message = "Id should be greater that 0") int id
+    ){
         Optional<Book> book=bs.getBookById(id);
         if(book.isEmpty()){
             return ResponseEntity.notFound().build();
@@ -52,34 +58,33 @@ public class BookController {
     }
     
     @PostMapping()
-    public ResponseEntity<Book> createBook(@RequestBody Book b){
-        if(b.getId()!=0 || b.getCategoryId()==0 || b.getPublisher()==null || b.getCategory()!=null){
-            return ResponseEntity.badRequest().build();
-        }else if(!cs.existCategoryById(b.getCategoryId())){
+    public ResponseEntity<Book> createBook(@RequestBody @Valid Book b){
+        if(!cs.existCategoryById(b.getCategoryId())){
             return ResponseEntity.badRequest().build();
         }else{
-                return ResponseEntity.status(HttpStatus.CREATED)
-                        .body(bs.createBook(b));  
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(bs.createBook(b));
         }
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Book> updateBook(@PathVariable int id, @RequestBody Book b){
+    public ResponseEntity<Book> updateBook(
+            @PathVariable @Min(value = 1, message = "id should be greater that 0") int id,
+            @RequestBody @Valid Book b
+    ){
         b.setId(id);
-        if(id<0){
-            return ResponseEntity.badRequest().build();
-        }else{
-            try {
-                return ResponseEntity.ok(bs.updateBook(b));
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                return ResponseEntity.notFound().build();
-            }
+        try {
+            return ResponseEntity.ok(bs.updateBook(b));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteBook(@PathVariable int id){
+    public ResponseEntity deleteBook(
+            @PathVariable @Min(value = 1, message = "id should be greater that 0") int id
+    ){
         bs.deleteBookById(id);
         return ResponseEntity.noContent().build();
     }    

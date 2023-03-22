@@ -4,7 +4,6 @@
  */
 package com.test.firstSpringApp.Entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,24 +14,39 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 
 /**
  *
  * @author papar
  */
+
 @Entity
 @Table(name = "Books")
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
+    @Max(value = 0, message = "id shouldn't be on body")
+    @Min(value = 0, message = "id shouldn't be on body")
     private int id;
     @Column(name = "CATEGORY_ID")
+    @Min(1)
+    @NotNull
     private int categoryId;
     @Column(name = "BOOK_TITLE")
+    @NotBlank
+    @Size(max = 60)
     private String bookTitle;
     @Column(name = "PUBLISHER")
+    @NotBlank
+    @Size(max=60)
     private String publisher;
     
     @OneToMany(mappedBy = "book")
@@ -42,6 +56,7 @@ public class Book {
     @ManyToOne
     @JoinColumn(name = "CATEGORY_ID", insertable = false, updatable = false)
     @JsonIgnoreProperties({"books","id"})
+    @Null(message = "You cannot set category like that")
     private Category category;
     
     public int getId() {
