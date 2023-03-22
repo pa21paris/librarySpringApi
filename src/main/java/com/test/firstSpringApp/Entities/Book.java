@@ -21,20 +21,21 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import java.util.List;
+import com.test.firstSpringApp.validationGroups.EntitiesWithoutId;
 
 /**
  *
  * @author papar
  */
-
 @Entity
 @Table(name = "Books")
 public class Book {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
-    @Max(value = 0, message = "id shouldn't be on body")
-    @Min(value = 0, message = "id shouldn't be on body")
+    @Max(value = 0, message = "id shouldn't be on body", groups = EntitiesWithoutId.class)
+    @Min(value = 0, message = "id shouldn't be on body", groups = EntitiesWithoutId.class)
     private int id;
     @Column(name = "CATEGORY_ID")
     @Min(1)
@@ -46,19 +47,19 @@ public class Book {
     private String bookTitle;
     @Column(name = "PUBLISHER")
     @NotBlank
-    @Size(max=60)
+    @Size(max = 60)
     private String publisher;
-    
+
     @OneToMany(mappedBy = "book")
     @JsonIgnoreProperties("book")
     private List<BookAuthor> authors;
 
     @ManyToOne
     @JoinColumn(name = "CATEGORY_ID", insertable = false, updatable = false)
-    @JsonIgnoreProperties({"books","id"})
+    @JsonIgnoreProperties({"books", "id"})
     @Null(message = "You cannot set category like that")
     private Category category;
-    
+
     public int getId() {
         return id;
     }
@@ -106,5 +107,5 @@ public class Book {
     public void setCategory(Category category) {
         this.category = category;
     }
-    
+
 }

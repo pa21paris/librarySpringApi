@@ -9,9 +9,15 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.test.firstSpringApp.Entities.Category;
+import com.test.firstSpringApp.validationGroups.EntitiesWithoutId;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import java.net.URI;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,86 +26,81 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 /**
  *
  * @author papar
  */
 @RestController
 @RequestMapping("/categories")
+@Validated(EntitiesWithoutId.class)
 public class CategoryController {
+
     @Autowired
     private CategoryService cs;
-    
+
     @GetMapping()
-    public ResponseEntity<List<Category>> getAllCategories(@RequestParam Optional<String> keyword){
-        if(keyword.isEmpty()){
+    public ResponseEntity<List<Category>> getAllCategories(@RequestParam Optional<String> keyword) {
+        if (keyword.isEmpty()) {
             try {
                 return ResponseEntity.ok(cs.getAllCategories());
             } catch (Exception e) {
-                System.out.println(e.getMessage());
                 return ResponseEntity.badRequest().build();
             }
-            
-        }else{
+
+        } else {
             return ResponseEntity.ok(cs.getCategoryByKeyWord(keyword.get()));
         }
-        
+
     }
+
     @GetMapping("/{id}")
-    public Category getCategoryById(@PathVariable int id){
-        Category cat;
+    public ResponseEntity<Category> getCategoryById(@PathVariable @Min(1) int id) {
         try {
-            cat=cs.getCategoryById(id);
+            return ResponseEntity.ok(cs.getCategoryById(id));
         } catch (Exception e) {
-            cat=new Category();
+            return ResponseEntity.notFound().build();
         }
-        return cat;
     }
-    
+
     @PostMapping()
-    public Category createCategory(@RequestBody Category newCategory){
-        if(newCategory.getId()!=0){
-            Category cat=new Category();
-            cat.setCategoryDescription("ids generate automatically");
-            return cat;
-        }else{
-            try {
-                newCategory.setId(cs.createNewCategory(newCategory).getId());
-            } catch (Exception e) {
-                newCategory.setCategoryDescription("There was an error creating the category");
-            }
-            return newCategory;
+    public ResponseEntity<Object> createCategory(@RequestBody @Valid Category newCategory) {
+        try {
+            newCategory = cs.createNewCategory(newCategory);
+            return ResponseEntity.created(new URI("/categories/" + newCategory.getId()))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(newCategory);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                    .body("{\"message\":\"There was an error creating the category\"}");
         }
-        
     }
-    
+
     @PutMapping("/{id}")
-    public Category updateCategory(@PathVariable int id, @RequestBody Category cat){
-        if(id<=0){
-            cat.setCategoryDescription("Invalid id");
-        }else if(cat.getId()!=0){
-            cat.setCategoryDescription("You shouldn't send id field on body");
-        }else{
-            cat.setId(id);
-            try {
-                cat=cs.updateCategory(cat);
-            } catch (Exception e) {
-                cat.setCategoryDescription("There was an error updating the category");
-            }
+    public ResponseEntity<Object> updateCategory(
+            @PathVariable @Min(1) int id, @RequestBody @Valid Category cat
+    ) {
+        cat.setId(id);
+        try {
+            return ResponseEntity.ok(cs.updateCategory(cat));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError()
+                    .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                    .body("{\"message\":\"There was an error updating the category\"}");
         }
-        return cat;
+
     }
-    
+
     @DeleteMapping("/{id}")
-    public String deleteCategory(@PathVariable int id){
-        String res;
+    public ResponseEntity<String> deleteCategory(@PathVariable @Min(1) int id) {
         try {
             cs.deleteCategoryById(id);
-            res="Deleted category successfully";
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            res="There was an error deleting the category";
+            return ResponseEntity.internalServerError()
+                    .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                    .body("{\"message\":\"There was an error deleting the category\"}");
         }
-        return res;
     }
 }

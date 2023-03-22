@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.test.firstSpringApp.validationGroups.EntitiesWithoutId;
+import org.springframework.http.MediaType;
 
 /**
  *
@@ -29,63 +31,64 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/books")
-@Validated
+@Validated(EntitiesWithoutId.class)
 public class BookController {
-    
+
     private CategoryService cs;
     private BookService bs;
-    
-    public BookController(BookService bs, CategoryService cs){
-        this.bs=bs;
-        this.cs=cs;
+
+    public BookController(BookService bs, CategoryService cs) {
+        this.bs = bs;
+        this.cs = cs;
     }
-    
+
     @GetMapping()
-    public ResponseEntity<List<Book>> getAllBooks(){
+    public ResponseEntity<List<Book>> getAllBooks() {
         return ResponseEntity.ok(bs.getAllBooks());
     }
-    
+
     @GetMapping("/{id}")
     public ResponseEntity<Book> getBookById(
-            @PathVariable @Min(value = 1,message = "Id should be greater that 0") int id
-    ){
-        Optional<Book> book=bs.getBookById(id);
-        if(book.isEmpty()){
+            @PathVariable @Min(value = 1, message = "Id should be greater that 0") int id
+    ) {
+        Optional<Book> book = bs.getBookById(id);
+        if (book.isEmpty()) {
             return ResponseEntity.notFound().build();
-        }else{
+        } else {
             return ResponseEntity.ok(book.get());
         }
     }
-    
+
     @PostMapping()
-    public ResponseEntity<Book> createBook(@RequestBody @Valid Book b){
-        if(!cs.existCategoryById(b.getCategoryId())){
-            return ResponseEntity.badRequest().build();
-        }else{
+    public ResponseEntity<Object> createBook(@RequestBody @Valid Book b) {
+        if (!cs.existCategoryById(b.getCategoryId())) {
+            return ResponseEntity.badRequest()
+                    .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                    .body("{\"message\":\"The category with id"+b.getCategoryId()+" doesn't exist\"}");
+        } else {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(bs.createBook(b));
         }
     }
-    
+
     @PutMapping("/{id}")
-    public ResponseEntity<Book> updateBook(
+    public ResponseEntity<Object> updateBook(
             @PathVariable @Min(value = 1, message = "id should be greater that 0") int id,
             @RequestBody @Valid Book b
-    ){
+    ) {
         b.setId(id);
         try {
             return ResponseEntity.ok(bs.updateBook(b));
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity deleteBook(
             @PathVariable @Min(value = 1, message = "id should be greater that 0") int id
-    ){
+    ) {
         bs.deleteBookById(id);
         return ResponseEntity.noContent().build();
-    }    
+    }
 }

@@ -5,6 +5,7 @@
 package com.test.firstSpringApp.Entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.test.firstSpringApp.validationGroups.EntitiesWithoutId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,9 +26,12 @@ import java.util.List;
 @Entity
 @Table(name = "Authors")
 public class Author {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
+    @Max(value = 0, message = "id shouldn't be on body", groups = EntitiesWithoutId.class)
+    @Min(value = 0, message = "id shouldn't be on body", groups = EntitiesWithoutId.class)
     private int id;
     @Column(name = "FIRST_NAME")
     @NotBlank(message = "Is required")
@@ -39,7 +43,7 @@ public class Author {
     @JsonIgnoreProperties("author")
     @Null(message = "There shouldn't be books on body")
     List<BookAuthor> books;
-    
+
     public int getId() {
         return id;
     }
@@ -71,5 +75,5 @@ public class Author {
     public void setBooks(List<BookAuthor> books) {
         this.books = books;
     }
-    
+
 }

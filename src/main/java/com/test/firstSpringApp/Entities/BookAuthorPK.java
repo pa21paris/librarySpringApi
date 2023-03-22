@@ -13,7 +13,8 @@ import java.io.Serializable;
  * @author papar
  */
 @Embeddable
-public class BookAuthorPK implements Serializable{
+public class BookAuthorPK implements Serializable {
+
     @Column(name = "ID_BOOK")
     private int idBook;
     @Column(name = "ID_AUTHOR")
@@ -34,5 +35,5 @@ public class BookAuthorPK implements Serializable{
     public void setIdAuthor(int idAuthor) {
         this.idAuthor = idAuthor;
     }
-    
+
 }
